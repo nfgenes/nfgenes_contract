@@ -13,6 +13,7 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
+/// @custom:security-contact nfgenes@protonmail.com
 contract VPBM is Ownable {
     /// @notice The NGgenes list is stored immutably on IPFS. A Merkle Tree is generated from that list and the
     /// root hash is stored below. If the NFgene DAO updates the NFgenes list, a new list will be published to

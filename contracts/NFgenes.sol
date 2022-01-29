@@ -5,7 +5,7 @@ pragma solidity ^0.8.11;
 /// @notice Mint an NFT representing one of ~40k unique human genes.
 /// @author The team at the NFgenes Project https://github.com/orgs/nfgenes/people
 
-// import "hardhat/consol.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
