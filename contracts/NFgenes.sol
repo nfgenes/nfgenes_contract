@@ -2,7 +2,8 @@
 pragma solidity ^0.8.11;
 
 /// @title NFgenes - Share knowledge, create value, build a community and teach science
-/// @notice Mint an NFT representing one of ~20k unique human genes.
+/// @notice Mint an NFT representing one of ~40k unique human genes.
+/// @author The team at the NFgenes Project https://github.com/orgs/nfgenes/people
 
 // import "hardhat/consol.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
