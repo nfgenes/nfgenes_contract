@@ -10,26 +10,28 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "./VPBM.sol";
 
 /// @custom:security-contact nfgenes@protonmail.com
-contract NFgenesTest is
+contract NFgenes is
     Ownable,
     ERC721,
-    ERC721URIStorage
+    ERC721URIStorage,
+    VPBM
 {
     using Counters for Counters.Counter;
     Counters.Counter private tokenIdCounter;
 
-    string baseURI = '';
+    string public baseURI = "";
+    uint public currentMintCount;
     // mapping(string => string) geneSymbolToName;
     // mapping(string => string) geneSymbolToLength;
     // mapping(string => string) geneSymbolToLocalization1;
     // mapping(string => string) geneSymbolToLocalization2;
 
-    constructor(string memory _initialBaseURI) ERC721("NFgenes", "GENE") {
-        // @dev increment _tokenIds to begin at 1 instead of 0
-        tokenIdCounter.increment();
-
+    constructor(string memory _initialBaseURI)
+        ERC721("NFgenes", "GENE")
+        VPBM(0x8401dfe0636ed99359594620a57d8b3ac1249a1290f67977fc1cc81471b516ff) {
         // @dev set initial base URI
         baseURI = _initialBaseURI;
     }
@@ -42,7 +44,7 @@ contract NFgenesTest is
         baseURI = _newBaseURI;
     }
 
-    function getBaseURI() public returns (string memory) {
+    function getBaseURI() public view returns (string memory) {
         return baseURI;
     }
 
