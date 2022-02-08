@@ -14,24 +14,35 @@ import "./VPBM.sol";
 
 /// @custom:security-contact nfgenes@protonmail.com
 contract NFgenes is
-    Ownable,
     ERC721,
     ERC721URIStorage,
+    Ownable,
     VPBM
 {
+    /// remove this strings declaration, was just using for testing purposes <======================================================
+    using Strings for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private tokenIdCounter;
 
+    /// @notice base IPFS CID containing the set of all NFgenes
     string public baseURI = "";
+
+    /// @dev maintain a count for number of NFgenes currently minted
     uint public currentMintCount;
+
+    /// @notice mapping of gene symbols (stored as bytes32) to addresses
+    mapping(bytes32 => address) public owners;
+
     // mapping(string => string) geneSymbolToName;
     // mapping(string => string) geneSymbolToLength;
     // mapping(string => string) geneSymbolToLocalization1;
     // mapping(string => string) geneSymbolToLocalization2;
 
-    constructor(string memory _initialBaseURI)
+    /// @param _initialBaseURI set an IPFS CID for the initial list of NFgenes
+    /// @param _rootHash initial Merkle Tree root hash
+    constructor(string memory _initialBaseURI, bytes32 _rootHash)
         ERC721("NFgenes", "GENE")
-        VPBM(0x8401dfe0636ed99359594620a57d8b3ac1249a1290f67977fc1cc81471b516ff) {
+        VPBM(_rootHash) {
         // @dev set initial base URI
         baseURI = _initialBaseURI;
     }
@@ -40,6 +51,10 @@ contract NFgenes is
     
     // }
 
+    /// @dev All NFgenes data will be stored on IPFS, but the CID could possibly change,
+    /// so while an initial baseURI will be set in the constructor, if a new list of genes
+    /// is published to IPFS, then the 'setBaseURI' method will be called to update it
+    /// @param _newBaseURI the new IPFS CID for the root folder containing all NFgenes
     function setBaseURI(string memory _newBaseURI) public onlyOwner {
         baseURI = _newBaseURI;
     }
@@ -48,20 +63,32 @@ contract NFgenes is
         return baseURI;
     }
 
-    /*
-     *  @dev override the following functions, as required by solidity
-     *  https://docs.soliditylang.org/en/v0.8.11/contracts.html?highlight=override#function-overriding
-    */
-    // @dev only allow the contract owner to burn a token
+    /// @dev only allow the contract owner to burn a token
     function _burn(uint256 _tokenId) internal override(ERC721, ERC721URIStorage) onlyOwner {
         super._burn(_tokenId);
     }
 
-    // @dev override to allow changing the base URI
+    /// @dev override to allow changing the baseURI inherited from ERC721.sol
+    /// @return the string value of the baseURI (IPFS CID Hash)
     function _baseURI() internal view override(ERC721) returns (string memory) {
         return baseURI;
     } 
 
-    function tokenURI(uint256 _tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+    // @param _tokenId the gene symbol
+    function tokenURI(bytes32 _tokenId) public view override returns (bytes32) {
+        require(_exists(_tokenId), "Token does not exist");
+
+        string memory tokenId = string(abi.encodePacked(baseURI, _tokenId));
+
+        return tokenId;
     }
+
+    function _exists(bytes32 tokenId) internal view override returns (bool) {
+        return owners[tokenId] != address(0);
+    }
+
+    // function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
+    //     require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    //     return tokenId.toString();
+    // }
 }

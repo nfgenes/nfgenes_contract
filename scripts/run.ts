@@ -3,7 +3,7 @@ const hre = require("hardhat");
 
 async function Main() {
     const contractFactory = await hre.ethers.getContractFactory('NFgenes');
-    const contract = await contractFactory.deploy("blahbalh");
+    const contract = await contractFactory.deploy("initialBaseURI", "0x8401dfe0636ed99359594620a57d8b3ac1249a1290f67977fc1cc81471b516ff");
 
     await contract.deployed();
     console.log("NFgenes Contract has been deployed to ", contract.address);
@@ -16,7 +16,7 @@ async function Main() {
     
     // check if we can change the baseURI
     console.log("Changing the baseURI...");
-    txn = await contract.setBaseURI("moreblahblah");
+    txn = await contract.setBaseURI("newBaseURI");
     console.log(`baseURI has been changed successfully`);
 
     // Get new baseURI

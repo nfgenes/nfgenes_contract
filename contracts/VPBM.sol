@@ -5,10 +5,6 @@ pragma solidity ^0.8.11;
 /// @notice Validate Merkle Proof for NFgenes List before minting
 /// @author The team at NFgenes https://github.com/orgs/nfgenes/people
 
-/*
- *  Import OpenZeppelin Merkle Tree Contract
- *  https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/MerkleProof.sol
-*/
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
@@ -21,14 +17,20 @@ contract VPBM is Ownable {
     bytes32 public rootHash;
 
     /// @notice Mapping to track when a gene has been minted
+    /// gene symbol => bool
     mapping(bytes32 => bool) public geneMinted;
 
+    /// @param _rootHash current Merkle Tree root hash
     constructor(bytes32 _rootHash) {
         rootHash = _rootHash;
     }
 
+    /// @notice submit a proof for verfication using params(leaf, proof)
+    /// @return bool, whether the submitted proof is valid
+    /// @param _leaf the value that is being validated
+    /// @param _proof the set of hashes used to validate the given leaf
     function verifyProof(bytes32 _leaf, bytes32[] calldata _proof) public virtual returns (bool) {
-        require(!geneMinted[_leaf], "This gene has already been minted");
+        require(!geneMinted[_leaf], "Gene has already been minted");
         require(MerkleProof.verify(_proof, rootHash, _leaf), "Invalid Proof");
         geneMinted[_leaf] = true;
         return true;
