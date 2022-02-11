@@ -27,7 +27,7 @@ contract VPBM is Ownable {
         rootHash = _rootHash;
     }
 
-    function mintGene(bytes32 _leaf, bytes32[] calldata _proof) public virtual returns (bool) {
+    function verifyProof(bytes32 _leaf, bytes32[] calldata _proof) public virtual returns (bool) {
         require(!geneMinted[_leaf], "This gene has already been minted");
         require(MerkleProof.verify(_proof, rootHash, _leaf), "Invalid Proof");
         geneMinted[_leaf] = true;
