@@ -28,8 +28,14 @@ contract NFgenes is
     /// @dev maintain a count for number of NFgenes currently minted
     uint public currentMintCount;
 
-    /// @notice mapping of gene symbols (tokenId) to addresses
-    mapping(uint256 => address) public owners;
+    /// @dev mapping of tokenIds to addresses
+    mapping(uint256 => address) public tokenIdsToOwner;
+
+    /// @dev mapping of tokenIds to symbols
+    mapping(uint256 => bytes32) public tokenIdToSymbol;
+
+    /// @dev mapping of symbols to tokenIds
+    mapping(bytes32 => uint256);
 
     // mapping(string => string) geneSymbolToName;
     // mapping(string => string) geneSymbolToLength;
@@ -79,11 +85,23 @@ contract NFgenes is
         return super.tokenURI(tokenId);
     }
 
-    function mintGene() external {
+    function mintGene(bytes32 _leaf, bytes32[] _proof) external {
         /// @dev get the current tokenId and assign to the new mint
         uint256 newTokenId = tokenIdCounter.current();
 
+        /// @dev verify the symbol before allowing mint
+        verifyProof(_leaf, _proof) {
+
+        }
+
         /// @dev assign the new tokenId to the calling address
         _safeMint(msg.sender, newTokenId);
+
+        /// @dev increment the mint counter
+        currentMintCount.increment();
+
+        /// @dev assign mappings
+        tokenIdsToOwner[msg.sender] = newTokenId;
+        tokenIdToSymbol
     } 
 }

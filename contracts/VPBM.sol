@@ -17,7 +17,6 @@ contract VPBM is Ownable {
     bytes32 public rootHash;
 
     /// @notice Mapping to track when a gene has been minted
-    /// gene symbol => bool
     mapping(bytes32 => bool) public geneMinted;
 
     /// @param _rootHash current Merkle Tree root hash
@@ -29,11 +28,10 @@ contract VPBM is Ownable {
     /// @return bool, whether the submitted proof is valid
     /// @param _leaf the value that is being validated
     /// @param _proof the set of hashes used to validate the given leaf
-    function verifyProof(bytes32 _leaf, bytes32[] calldata _proof) public virtual returns (bool) {
+    function verifyProof(bytes32 _leaf, bytes32[] calldata _proof) public virtual {
         require(!geneMinted[_leaf], "Gene has already been minted");
         require(MerkleProof.verify(_proof, rootHash, _leaf), "Invalid Proof");
         geneMinted[_leaf] = true;
-        return true;
     }
 
     function modifyRootHash(bytes32 _rootHash) public onlyOwner {
