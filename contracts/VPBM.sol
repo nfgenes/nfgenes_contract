@@ -25,7 +25,6 @@ contract VPBM is Ownable {
     }
 
     /// @notice submit a proof for verfication using params(leaf, proof)
-    /// @return bool, whether the submitted proof is valid
     /// @param _leaf the value that is being validated
     /// @param _proof the set of hashes used to validate the given leaf
     function verifyProof(bytes32 _leaf, bytes32[] calldata _proof) public virtual {
