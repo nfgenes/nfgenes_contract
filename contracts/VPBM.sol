@@ -15,7 +15,7 @@ contract VPBM is Ownable {
     /// root hash is stored below. If the NFgene DAO updates the NFgenes list, a new list will be published to
     /// IPFS and the corresponding root hash below will be replaced.
     bytes32 public rootHash;
-
+    
     /// @notice Mapping to track when a gene has been minted
     mapping(bytes32 => bool) public geneMinted;
 
