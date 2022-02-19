@@ -3,7 +3,7 @@ const hre = require("hardhat");
 
 async function Main() {
     const contractFactory = await hre.ethers.getContractFactory('NFgenes');
-    const contract = await contractFactory.deploy("initialBaseURI", "0x8401dfe0636ed99359594620a57d8b3ac1249a1290f67977fc1cc81471b516ff");
+    const contract = await contractFactory.deploy("initialBaseURI", "0x30e5855111ba1693c9e0f111119d66e61d759b5237245c3c5efb42c8839d146e");
 
     await contract.deployed();
     console.log("NFgenes Contract has been deployed to ", contract.address);
@@ -26,6 +26,14 @@ async function Main() {
     // Get the current root hash
     txn = await contract.rootHash();
     console.log(`Current root hash: ${txn}`);
+
+    // Change the root hash
+    txn = await contract.modifyRootHash("0x30e5855111ba1693c9e0f036809d66e61d759b5237245c3c5efb42c8839d146e");
+    console.log(`Root has been changed successfully`);
+   // Get the new root hash
+   txn = await contract.rootHash();
+   console.log(`New root hash is ${txn}`);
+    
 }
 
 async function runMain() {
