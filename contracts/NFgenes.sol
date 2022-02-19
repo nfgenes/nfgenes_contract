@@ -22,11 +22,11 @@ contract NFgenes is
     using Counters for Counters.Counter;
     Counters.Counter private tokenIdCounter;
 
+    /// @dev maintain a count for number of NFgenes currently minted
+    Counters.Counter public currentMintCount;
+
     /// @notice base IPFS CID containing the set of all NFgenes
     string public baseURI = "";
-
-    /// @dev maintain a count for number of NFgenes currently minted
-    uint public currentMintCount;
 
     /// @dev mapping of tokenIds to addresses
     mapping(uint256 => address) public tokenIdsToOwner;
@@ -35,7 +35,7 @@ contract NFgenes is
     mapping(uint256 => bytes32) public tokenIdToSymbol;
 
     /// @dev mapping of symbols to tokenIds
-    mapping(bytes32 => uint256);
+    mapping(bytes32 => uint256) public symbolToTokenId;
 
     // mapping(string => string) geneSymbolToName;
     // mapping(string => string) geneSymbolToLength;
@@ -85,23 +85,28 @@ contract NFgenes is
         return super.tokenURI(tokenId);
     }
 
-    function mintGene(bytes32 _leaf, bytes32[] _proof) external {
+    function mintGene(bytes32 _leaf, bytes32[] calldata _proof) external {
         /// @dev get the current tokenId and assign to the new mint
         uint256 newTokenId = tokenIdCounter.current();
 
         /// @dev verify the symbol before allowing mint
-        verifyProof(_leaf, _proof) {
+        bool geneVerified = verifyProof(_leaf, _proof);
 
-        }
+        geneVerified ? mint(newTokenId, geneVerified, _leaf) : revert("invalid proof");
+    }
+
+    function mint(uint256 _newTokenId, bool _geneVerified, bytes32 _leaf) private {
+        require(_geneVerified, "unable to mint");
 
         /// @dev assign the new tokenId to the calling address
-        _safeMint(msg.sender, newTokenId);
+        _safeMint(msg.sender, _newTokenId);
 
         /// @dev increment the mint counter
         currentMintCount.increment();
 
         /// @dev assign mappings
-        tokenIdsToOwner[msg.sender] = newTokenId;
-        tokenIdToSymbol
-    } 
+        tokenIdsToOwner[_newTokenId] = msg.sender;
+        tokenIdToSymbol[_newTokenId] = _leaf;
+        symbolToTokenId[_leaf] = _newTokenId;
+    }
 }
