@@ -33,10 +33,10 @@ contract NFgenes is
     mapping(uint256 => address) public tokenIdToOwner;
 
     /// @dev mapping of tokenIds to symbols
-    mapping(uint256 => bytes32) public tokenIdToSymbol;
+    mapping(uint256 => bytes) public tokenIdToSymbol;
 
     /// @dev mapping of symbols to tokenIds
-    mapping(bytes32 => uint256) public symbolToTokenId;
+    mapping(bytes => uint256) public symbolToTokenId;
 
     // mapping(string => string) geneSymbolToName;
     // mapping(string => string) geneSymbolToLength;
@@ -98,8 +98,8 @@ contract NFgenes is
     }
 
     function mint(uint256 _newTokenId, bool _geneVerified, bytes32 _leafHash, bytes memory _leafValue) private {
-        require(_geneVerified, "unable to mint");
-        require(_leafHash == keccak256(_leafValue), "the values are not matching");
+        require(_geneVerified, "Mint failed. Gene not verified");
+        require(_leafHash == keccak256(_leafValue), "leaf hash & leaf value mismatch");
 
         /// @dev assign the new tokenId to the calling address
         console.log("Minting token for",msg.sender);
@@ -110,8 +110,11 @@ contract NFgenes is
 
         /// @dev assign mappings
         tokenIdToOwner[_newTokenId] = msg.sender;
-        // tokenIdToSymbol[_newTokenId] = _leafValue;
-        // symbolToTokenId[_leafValue] = _newTokenId;
+        tokenIdToSymbol[_newTokenId] = _leafValue;
+        symbolToTokenId[_leafValue] = _newTokenId;
+
+        /// @dev update VPBM to reflect this gene being minted
+        geneMinted[_leafHash] = true;
 
         console.log("Token minted successfully");
     }
@@ -120,7 +123,11 @@ contract NFgenes is
         return tokenIdToOwner[_tokenId];
     }
 
-    function getTokenIdToSymbol(uint256 _tokenId) public view returns (bytes32) {
+    function getTokenIdToSymbol(uint256 _tokenId) public view returns (bytes memory) {
         return tokenIdToSymbol[_tokenId];
+    }
+
+    function getSymbolToTokenId(bytes memory _symbol) public view returns (uint256) {
+        return symbolToTokenId[_symbol];
     }
 }
