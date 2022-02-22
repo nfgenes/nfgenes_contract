@@ -36,21 +36,12 @@ async function Main() {
     
    // attempt to mint a valid gene with provided leaf hash and corresponding proof
    let value = "0x2EF9A043955f934c93632C9E45BA739e5468DA6d"
-   console.log(`Hash Should be: 0x65e76fcc6f5e02b785a4638d0e6e11260b0479477ff966037c7b6410da14ec22\n`);
-   const sk256 = ethers.utils.solidityKeccak256(["address"], [value]);
-   console.log(`solidityKeccak256 ["address"], [${value}]:\n ${sk256}`);
-   console.log("\n");
-   const sk256String = ethers.utils.solidityKeccak256(["string"], [value]);
-   console.log(`solidityKeccak256 ["string"], [${value}]:\n ${sk256String}`);
-   console.log("\n");
-   const sk256Uint256 = ethers.utils.solidityKeccak256(["uint256"], [value]);
-   console.log(`solidityKeccak256 ["uint256"], [${value}]:\n ${sk256Uint256}`);
-   console.log("\n");
-   const k256 = ethers.utils.keccak256(value);
-   console.log(`Keccak256 ${value}:\n ${k256}`);
-   console.log("\n");   
+
+   // check if value is already minted
+   txn = await contract.geneMinted("0x65e76fcc6f5e02b785a4638d0e6e11260b0479477ff966037c7b6410da14ec22");
+   console.log(`Gene Minted?: ${txn}`);
    
-   // mintGene params: bytes32 _leafHash, bytes32[] calldata _proof, string memory _leafValue
+   // mintGene params: bytes32 _leafHash, bytes32[] calldata _proof, bytes memory _leafValue
    txn = await contract.mintGene("0x65e76fcc6f5e02b785a4638d0e6e11260b0479477ff966037c7b6410da14ec22", [
     "0x824fe4d63410846552b59181adc9ee0a427efd7ae3e34f1a57bd42e224172562",
     "0xc6c50f6da05fe9aa90a614fa79f6da1de9406ddcf4b1103bc72a2928e23989e9",
@@ -67,13 +58,16 @@ async function Main() {
     txn = await contract.getTokenIdToOwner(mintCount);
     console.log(`Token Id #1 Owner: ${txn}`);
 
+    let symbol = await contract.getTokenIdToSymbol(mintCount);
     txn = await contract.getTokenIdToSymbol(mintCount);
-    // let symbol = ethers.utils.hexlify(txn);
-    // console.log(`Token Id #1 Symbol: ${symbol}`);
+    console.log(`Token Id #1 Symbol: ${symbol}`);
 
-    // txn = await contract.symbolToTokenId(symbol);
-    // console.log(`Symbol ${symbol} token id: ${txn}`);
-    
+    txn = await contract.getSymbolToTokenId(symbol);
+    console.log(`Symbol ${symbol} token id: ${mintCount}`);
+
+    // check if value is already minted
+   txn = await contract.geneMinted("0x65e76fcc6f5e02b785a4638d0e6e11260b0479477ff966037c7b6410da14ec22");
+   console.log(`Gene Minted?: ${txn}`);
 }
 
 async function runMain() {

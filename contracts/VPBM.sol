@@ -35,7 +35,6 @@ contract VPBM is Ownable {
         ) public virtual returns (bool) {
             require(!geneMinted[_leaf], "Gene has already been minted");
             require(MerkleProof.verify(_proof, rootHash, _leaf), "Invalid Proof");
-            geneMinted[_leaf] = true;
             return true;
     }
 }
