@@ -8,6 +8,7 @@ pragma solidity ^0.8.11;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "./VPBM.sol";
@@ -29,7 +30,7 @@ contract NFgenes is
     string public baseURI = "";
 
     /// @dev mapping of tokenIds to addresses
-    mapping(uint256 => address) public tokenIdsToOwner;
+    mapping(uint256 => address) public tokenIdToOwner;
 
     /// @dev mapping of tokenIds to symbols
     mapping(uint256 => bytes32) public tokenIdToSymbol;
@@ -85,28 +86,41 @@ contract NFgenes is
         return super.tokenURI(tokenId);
     }
 
-    function mintGene(bytes32 _leaf, bytes32[] calldata _proof) external {
+    function mintGene(bytes32 _leafHash, bytes32[] calldata _proof, bytes memory _leafValue) external {
         /// @dev get the current tokenId and assign to the new mint
         uint256 newTokenId = tokenIdCounter.current();
+        console.log("Minting token #",newTokenId);
 
-        /// @dev verify the symbol before allowing mint
-        bool geneVerified = verifyProof(_leaf, _proof);
+        /// @dev verify the symbol before allowing mint against a merkle proof
+        bool geneVerified = verifyProof(_leafHash, _proof);
 
-        geneVerified ? mint(newTokenId, geneVerified, _leaf) : revert("invalid proof");
+        geneVerified ? mint(newTokenId, geneVerified, _leafHash, _leafValue) : revert("invalid proof");
     }
 
-    function mint(uint256 _newTokenId, bool _geneVerified, bytes32 _leaf) private {
+    function mint(uint256 _newTokenId, bool _geneVerified, bytes32 _leafHash, bytes memory _leafValue) private {
         require(_geneVerified, "unable to mint");
+        require(_leafHash == keccak256(_leafValue), "the values are not matching");
 
         /// @dev assign the new tokenId to the calling address
+        console.log("Minting token for",msg.sender);
         _safeMint(msg.sender, _newTokenId);
 
         /// @dev increment the mint counter
         currentMintCount.increment();
 
         /// @dev assign mappings
-        tokenIdsToOwner[_newTokenId] = msg.sender;
-        tokenIdToSymbol[_newTokenId] = _leaf;
-        symbolToTokenId[_leaf] = _newTokenId;
+        tokenIdToOwner[_newTokenId] = msg.sender;
+        // tokenIdToSymbol[_newTokenId] = _leafValue;
+        // symbolToTokenId[_leafValue] = _newTokenId;
+
+        console.log("Token minted successfully");
+    }
+
+    function getTokenIdToOwner(uint256 _tokenId) public view returns (address) {
+        return tokenIdToOwner[_tokenId];
+    }
+
+    function getTokenIdToSymbol(uint256 _tokenId) public view returns (bytes32) {
+        return tokenIdToSymbol[_tokenId];
     }
 }
